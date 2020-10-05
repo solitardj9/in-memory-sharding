@@ -1,0 +1,11 @@
+server:
+  port: 18781
+  
+spring:
+  application:
+    name: imsd-master-service
+    
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:18771/eureka
