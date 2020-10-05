@@ -1,0 +1,16 @@
+server:
+  port: 18771
+  
+spring:
+  application:
+    name: discovery-service
+
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    registerWithEureka: false
+    fetchRegistry: false
+    serviceUrl: 
+      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
+       #서버 두대일때 다른서버 IP 만 설정 (defaultZone: http://다른서버IP:8088/eureka/) 

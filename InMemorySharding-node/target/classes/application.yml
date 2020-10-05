@@ -1,0 +1,11 @@
+server:
+  port: 18791
+  
+spring:
+  application:
+    name: imsd-slave-service-group-1
+    
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:18771/eureka
