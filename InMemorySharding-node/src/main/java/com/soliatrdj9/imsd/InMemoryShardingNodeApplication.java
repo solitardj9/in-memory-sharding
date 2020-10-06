@@ -15,7 +15,12 @@ import com.hazelcast.core.IMap;
 import com.hazelcast.query.EntryObject;
 import com.hazelcast.query.Predicate;
 import com.hazelcast.query.PredicateBuilder;
+import com.soliatrdj9.imsd.application.mainNode.mapManager.model.exception.ExceptionMapConflict;
+import com.soliatrdj9.imsd.application.mainNode.mapManager.model.exception.ExceptionMapManagerInternalFailure;
 import com.soliatrdj9.imsd.application.mainNode.mapManager.service.MapManager;
+import com.soliatrdj9.imsd.application.mainNode.shardingStrategyManager.model.exceptiion.ExceptionShardingSeedNotFound;
+import com.soliatrdj9.imsd.application.mainNode.shardingStrategyManager.model.exceptiion.ExceptionShardingStrategyManagerInternalFailure;
+import com.soliatrdj9.imsd.application.mainNode.shardingStrategyManager.service.ShardingStrategyManager;
 import com.soliatrdj9.imsd.systemInterface.imdgInterface.model.exception.ExceptionHazelcastDistributedObjectNameConflict;
 import com.soliatrdj9.imsd.systemInterface.imdgInterface.model.exception.ExceptionHazelcastIMapNotFound;
 import com.soliatrdj9.imsd.systemInterface.imdgInterface.model.exception.ExceptionHazelcastServerAlreadyClosed;
@@ -48,7 +53,11 @@ public class InMemoryShardingNodeApplication {
 				"    }\n" + 
 				"}";
 		
-		((MapManager)context.getBean("mapManager")).addMapInfo(strMapInfo);
+		try {
+			((MapManager)context.getBean("mapManager")).addMapInfo(strMapInfo);
+		} catch (BeansException | ExceptionMapConflict | ExceptionMapManagerInternalFailure e) {
+			e.printStackTrace();
+		}
 		
 		String jsonInfo = "{\n" + 
 				 		  "    \"name\" : \"Jhon\",\n" + 
@@ -63,6 +72,12 @@ public class InMemoryShardingNodeApplication {
 		String jsonInfo2 = "{\n" + 
 				  "    \"name\" : \"Cha\",\n" + 
 				  "    \"age\" : 41\n" + 
+				  "}";
+		
+		String jsonInfo3 = "{\n" + 
+				  "    \"name\" : \"wbdkwebkklwenf\",\n" + 
+				  "    \"age\" : 1234124,\n" + 
+				  "    \"what\" : 41\n" + 
 				  "}";
 		
 		try {
@@ -98,6 +113,15 @@ public class InMemoryShardingNodeApplication {
 			}
 			
 		} catch (BeansException | ExceptionHazelcastServerAlreadyClosed | ExceptionHazelcastDistributedObjectNameConflict | ExceptionHazelcastIMapNotFound e) {
+			e.printStackTrace();
+		}
+		
+		try {
+			System.out.println(((ShardingStrategyManager)context.getBean("shardingStrategyManager")).extractShardingSeed("myMap", jsonInfo));
+			System.out.println(((ShardingStrategyManager)context.getBean("shardingStrategyManager")).extractShardingSeed("myMap", jsonInfo1));
+			System.out.println(((ShardingStrategyManager)context.getBean("shardingStrategyManager")).extractShardingSeed("myMap", jsonInfo2));
+			System.out.println(((ShardingStrategyManager)context.getBean("shardingStrategyManager")).extractShardingSeed("myMap", jsonInfo3));
+		} catch (ExceptionShardingSeedNotFound | ExceptionShardingStrategyManagerInternalFailure e) {
 			e.printStackTrace();
 		}
 	}
