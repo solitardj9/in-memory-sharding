@@ -11,7 +11,7 @@ import com.soliatrdj9.imsd.systemInterface.imdgInterface.model.exception.Excepti
 
 public interface InMemoryDataNodeManager {
 	//
-	public Boolean startServer() throws ExceptionHazelcastServerAlreadyOpened, ExceptionHazelcastServerConfigError;
+	public Boolean startServer(String groupName, String nodeName) throws ExceptionHazelcastServerAlreadyOpened, ExceptionHazelcastServerConfigError;
 	
 	public Boolean stopServer() throws ExceptionHazelcastServerAlreadyClosed;
 	
@@ -22,4 +22,6 @@ public interface InMemoryDataNodeManager {
 	public IMap<Object, Object> getMap(String map) throws ExceptionHazelcastServerAlreadyClosed, ExceptionHazelcastIMapNotFound;
 	
 	public void clearMap(String map) throws ExceptionHazelcastServerAlreadyClosed, ExceptionHazelcastIMapNotFound;
+	
+	public String getGroupName() throws ExceptionHazelcastServerAlreadyClosed, ExceptionHazelcastServerConfigError;
 }

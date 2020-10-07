@@ -14,6 +14,7 @@ import com.hazelcast.config.Config;
 import com.hazelcast.config.FileSystemXmlConfig;
 import com.hazelcast.config.LockConfig;
 import com.hazelcast.config.MapConfig;
+import com.hazelcast.config.MemberAttributeConfig;
 import com.hazelcast.core.DistributedObject;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
@@ -42,27 +43,39 @@ public class InMemoryDataNodeManagerImpl implements InMemoryDataNodeManager {
 	@PostConstruct
 	public void init() {
 		//
-		try {
-			start();
-		} catch (FileNotFoundException e) {
-			logger.info("[InMemoryDataNodeManager].init : error = " + e);
-		}
+//		try {
+//			start();
+//		} catch (FileNotFoundException e) {
+//			logger.info("[InMemoryDataNodeManager].init : error = " + e);
+//		}
 		
 		logger.info("[InMemoryDataNodeManager].init : Hazelcast Server is loaded.");
 	}
 	
-	private void start() throws FileNotFoundException {
+	private void start(String groupName, String nodeName) throws FileNotFoundException {
 		//
 		logger.info("[InMemoryDataNodeManager].start : Hazelcast Server try to start.");
 		
 		try {
 			config = new FileSystemXmlConfig(configPath);
+			config.getGroupConfig().setName(groupName);
+			
+			if (nodeName != null && !nodeName.isEmpty()) {
+				MemberAttributeConfig memberAttributeConfig = config.getMemberAttributeConfig();
+				memberAttributeConfig.getAttributes().put("nodeName", nodeName);
+				config.setMemberAttributeConfig(memberAttributeConfig);
+			}
 		} catch (Exception e) {
 			logger.error("[InMemoryDataNodeManager].start : error = " + e);
 			throw new FileNotFoundException();
 		}
 		
 		hazelcastInstance = Hazelcast.newHazelcastInstance(config);
+		
+		for (Member iter : hazelcastInstance.getCluster().getMembers()) {
+			logger.info("[InMemoryDataNodeManager].start : UUID = " + iter.getUuid());
+			logger.info("[InMemoryDataNodeManager].start : Attribute = " + iter.getAttributes().toString());
+		}
 		
 		logger.info("[InMemoryDataNodeManager].start : Hazelcast Server start.");
 		
@@ -85,13 +98,13 @@ public class InMemoryDataNodeManagerImpl implements InMemoryDataNodeManager {
 	}
 	
 	@Override
-	public Boolean startServer() throws ExceptionHazelcastServerAlreadyOpened, ExceptionHazelcastServerConfigError {
+	public Boolean startServer(String groupName, String nodeName) throws ExceptionHazelcastServerAlreadyOpened, ExceptionHazelcastServerConfigError {
 		//
 		if (hazelcastInstance != null)
 			throw new ExceptionHazelcastServerAlreadyOpened();
 		
 		try {
-			start();
+			start(groupName, nodeName);
 			return true;
 		} catch (FileNotFoundException e) {
 			logger.error("[InMemoryDataNodeManager].startServer : error = " + e);
@@ -206,5 +219,17 @@ public class InMemoryDataNodeManagerImpl implements InMemoryDataNodeManager {
 			hazelcastInstance.getMap(map).clear();
 		else
 			throw new ExceptionHazelcastIMapNotFound();
+	}
+	
+	public String getGroupName() throws ExceptionHazelcastServerAlreadyClosed, ExceptionHazelcastServerConfigError {
+		//
+		if (hazelcastInstance == null)
+			throw new ExceptionHazelcastServerAlreadyClosed();
+		
+		String groupName = hazelcastInstance.getConfig().getGroupConfig().getName();
+		if (groupName == null || groupName.isEmpty())
+			throw new ExceptionHazelcastServerConfigError();
+		
+		return groupName;
 	}
 }

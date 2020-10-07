@@ -21,32 +21,26 @@ public class IpcManagerImpl implements IpcManager {
 	@Autowired
 	EurekaClient discoveryClient;
 
-	private String imsdMaster = "imsd-master-service";
-	//private String imsdMaster = "IMSD-MASTER-SERVICE";
-	
 	@Override
-	public String registerSlaveNode(String node) {
-		// TODO Auto-generated method stub
-		
-		String serviceName = imsdMaster;
-		
+	public String executeBackupAndRestore(String groupName, String requestBody) {
+		//
 		try {
-			InstanceInfo instance = discoveryClient.getNextServerFromEureka(serviceName, false);
+			InstanceInfo instance = discoveryClient.getNextServerFromEureka(groupName, false);
 			String url = instance.getHomePageUrl();
-			ImsdMasterNode imsdMasterNode = Feign.builder()
+			BackupAndRestore backupAndRestore = Feign.builder()
 													.contract(new Contract.Default())
 													.retryer(new Retryer.Default())
 													.encoder(new Encoder.Default())
 													.decoder(new Decoder.Default())
 													.decode404()
 													.logLevel(Logger.Level.BASIC)
-													.target(new Target.HardCodedTarget<>(ImsdMasterNode.class, url));
+													.target(new Target.HardCodedTarget<>(BackupAndRestore.class, url));
 			
-			String strResult = imsdMasterNode.registerSlaveNode(node);
+			String strResult = backupAndRestore.executeBackupAndRestore(requestBody);
 			return strResult;
 		}
 		catch (Exception e) {
-			System.out.println("[IpcManager].registerSlaveNode : error = " + e);
+			System.out.println("[IpcManager].executeBackupAndRestore : error = " + e);
 			return null;
 		}
 	}

@@ -2,6 +2,7 @@ package com.soliatrdj9.imsd.systemInterface.imdgInterface.service.impl;
 
 import java.io.FileNotFoundException;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
@@ -14,6 +15,7 @@ import com.hazelcast.config.Config;
 import com.hazelcast.config.FileSystemXmlConfig;
 import com.hazelcast.config.LockConfig;
 import com.hazelcast.config.MapConfig;
+import com.hazelcast.config.MemberAttributeConfig;
 import com.hazelcast.core.DistributedObject;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
@@ -42,11 +44,11 @@ public class InMemoryMainNodeManagerImpl implements InMemoryMainNodeManager {
 	@PostConstruct
 	public void init() {
 		//
-		try {
-			start();
-		} catch (FileNotFoundException e) {
-			logger.info("[InMemoryMainNodeManager].init : error = " + e);
-		}
+//		try {
+//			start();
+//		} catch (FileNotFoundException e) {
+//			logger.info("[InMemoryMainNodeManager].init : error = " + e);
+//		}
 		
 		logger.info("[InMemoryMainNodeManager].init : Hazelcast Server is loaded.");
 	}

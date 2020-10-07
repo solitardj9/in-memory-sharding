@@ -3,7 +3,7 @@ server:
   
 spring:
   application:
-    name: imsd-master-service
+    name: api-gateway-service
     
 eureka:
   client:
