@@ -20,21 +20,11 @@ public interface MainNodeManager {
 	
 	public void stopNodeInReplicatonMode() throws ExceptionStopNodeInReplicatonModeFailure;
 	
-	public void startNodeInShardingMode(Float criteriaHashSeed) throws ExceptionStartNodeInShardingModeFailure, ExceptionStartNodeInShardingModeConflict;
+	public void startNodeInShardingMode(Double criteriaHashSeed) throws ExceptionStartNodeInShardingModeFailure, ExceptionStartNodeInShardingModeConflict;
 	
 	public void stopNodeInShardingMode() throws ExceptionStopNodeInShardingModeFailure;
 	
 	
 	
 	
-	
-	
-	
-	
-	public String/*spring.application.name*/ getDataNodeName(String map, String seed);
-	
-	// TODO : need to upgrade
-	public void needToRedistribute();
-	
-	// TODO : need to upgrade
 }

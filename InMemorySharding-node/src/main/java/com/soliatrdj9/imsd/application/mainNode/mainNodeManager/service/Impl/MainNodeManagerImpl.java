@@ -119,7 +119,7 @@ public class MainNodeManagerImpl implements MainNodeManager, InMemoryEventListen
 	}
 	
 	@Override
-	public void startNodeInShardingMode(Float criteriaHashSeed) throws ExceptionStartNodeInShardingModeFailure, ExceptionStartNodeInShardingModeConflict {
+	public void startNodeInShardingMode(Double criteriaHashSeed) throws ExceptionStartNodeInShardingModeFailure, ExceptionStartNodeInShardingModeConflict {
 		//
 		try {
 			inMemoryMainNodeManager.startServer();
@@ -165,13 +165,7 @@ public class MainNodeManagerImpl implements MainNodeManager, InMemoryEventListen
 	public void stopNodeInShardingMode() throws ExceptionStopNodeInShardingModeFailure {
 		// TODO : 
 	}
-	
-	
-	
-	
-	
-	
-	
+
 	private void createTopologyMap() throws ExceptionHazelcastServerAlreadyClosed, ExceptionHazelcastDistributedObjectNameConflict, ExceptionHazelcastIMapBadRequest {
 		//
 		InMemoryInstane inMemoryInstane = new InMemoryInstane();
@@ -226,11 +220,11 @@ public class MainNodeManagerImpl implements MainNodeManager, InMemoryEventListen
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private ReDistributionStrategy calculateHashSeed(Float criteriaHashSeed, Map<String, DataNodeGroup> topologyMap) throws ExceptionHazelcastServerAlreadyClosed, ExceptionHazelcastServerConfigError, ExceptionHazelcastIMapNotFound {
+	private ReDistributionStrategy calculateHashSeed(Double criteriaHashSeed, Map<String, DataNodeGroup> topologyMap) throws ExceptionHazelcastServerAlreadyClosed, ExceptionHazelcastServerConfigError, ExceptionHazelcastIMapNotFound {
 		//
 		if (topologyMap.isEmpty()) {
 			// empty topology, first group
-			HashSeedInfo hashSeedInfo = new HashSeedInfo(0.0f, 1.0f);
+			HashSeedInfo hashSeedInfo = new HashSeedInfo(0.0D, 1.0D);
 			
 			CopyOnWriteArrayList<DataNode> dataNodes = new CopyOnWriteArrayList<>();
 			dataNodes.add(new DataNode(nodeName));
@@ -244,16 +238,16 @@ public class MainNodeManagerImpl implements MainNodeManager, InMemoryEventListen
 		else {
 			// not empty topology, added group
 			if (criteriaHashSeed == null) {
-				Map<Float/*diff*/, Map<Float/*min*/, DataNodeGroup>> sortedMap = new TreeMap<>(Collections.reverseOrder());
+				Map<Double/*diff*/, Map<Double/*min*/, DataNodeGroup>> sortedMap = new TreeMap<>(Collections.reverseOrder());
 				
 				for (Entry<String, DataNodeGroup> iter : topologyMap.entrySet()) {
 					//
 					DataNodeGroup tmpDataNodeGroup = iter.getValue();
-					Float tmpMaxSeed = tmpDataNodeGroup.getHashSeedInfo().getMaxSeed();
-					Float tmpMinSeed = tmpDataNodeGroup.getHashSeedInfo().getMinSeed();
-					Float diffSeed = tmpMaxSeed - tmpMinSeed;
+					Double tmpMaxSeed = tmpDataNodeGroup.getHashSeedInfo().getMaxSeed();
+					Double tmpMinSeed = tmpDataNodeGroup.getHashSeedInfo().getMinSeed();
+					Double diffSeed = tmpMaxSeed - tmpMinSeed;
 					
-					Map<Float, DataNodeGroup> dataNodeGroupMap = sortedMap.getOrDefault(diffSeed, new TreeMap<Float, DataNodeGroup>());
+					Map<Double, DataNodeGroup> dataNodeGroupMap = sortedMap.getOrDefault(diffSeed, new TreeMap<Double, DataNodeGroup>());
 					dataNodeGroupMap.put(tmpMinSeed, tmpDataNodeGroup);
 					
 					sortedMap.put(diffSeed, dataNodeGroupMap);
@@ -262,24 +256,24 @@ public class MainNodeManagerImpl implements MainNodeManager, InMemoryEventListen
 				logger.info("[MainNodeManager].calculateHashSeed : sortedMap = " + sortedMap.toString());
 				
 				Set set = sortedMap.entrySet();
-			    Iterator iterator = set.iterator();
-			    DataNodeGroup targetDataNodeGroup = null;
-			    if (iterator.hasNext()) {
-			    	Map.Entry me = (Map.Entry)iterator.next();
-			    	targetDataNodeGroup = ((TreeMap<Float, DataNodeGroup>) me.getValue()).firstEntry().getValue();
+				Iterator iterator = set.iterator();
+				DataNodeGroup targetDataNodeGroup = null;
+				if (iterator.hasNext()) {
+					Map.Entry me = (Map.Entry)iterator.next();
+			    	targetDataNodeGroup = ((TreeMap<Double, DataNodeGroup>) me.getValue()).firstEntry().getValue();
 			    
-				    Float tmpMaxSeed = targetDataNodeGroup.getHashSeedInfo().getMaxSeed();
-					Float tmpMinSeed = targetDataNodeGroup.getHashSeedInfo().getMinSeed();
+			    	Double tmpMaxSeed = targetDataNodeGroup.getHashSeedInfo().getMaxSeed();
+			    	Double tmpMinSeed = targetDataNodeGroup.getHashSeedInfo().getMinSeed();
 					
 					criteriaHashSeed = (tmpMaxSeed + tmpMinSeed) / 2.0f;
 					
-					Float newMaxSeedOfTargetDataNodeGroup = criteriaHashSeed - 0.001f;
-					Float newMinSeedOfTargetDataNodeGroup = tmpMinSeed;
+					Double newMaxSeedOfTargetDataNodeGroup = criteriaHashSeed - 0.001D;
+					Double newMinSeedOfTargetDataNodeGroup = tmpMinSeed;
 					
 					DataNodeGroup fromDataNodeGroup = new DataNodeGroup(targetDataNodeGroup.getGroupName(), new HashSeedInfo(newMinSeedOfTargetDataNodeGroup, newMaxSeedOfTargetDataNodeGroup), null);
 					
-					Float newMaxSeedOfMyDataNodeGroup = tmpMaxSeed;
-					Float newMinSeedOfMyDataNodeGroup = criteriaHashSeed;
+					Double newMaxSeedOfMyDataNodeGroup = tmpMaxSeed;
+					Double newMinSeedOfMyDataNodeGroup = criteriaHashSeed;
 					
 					CopyOnWriteArrayList<DataNode> dataNodes = new CopyOnWriteArrayList<>();
 					dataNodes.add(new DataNode(nodeName));
@@ -288,28 +282,52 @@ public class MainNodeManagerImpl implements MainNodeManager, InMemoryEventListen
 					
 					return new ReDistributionStrategy(fromDataNodeGroup, toDataNodeGroup);
 			    }
-			    
-			    return new ReDistributionStrategy(null, null);
+				
+				return new ReDistributionStrategy(null, null);
 			}
 			else {
-				// TODO : 
-				return null;
+				DataNodeGroup targetDataNodeGroup = null;
+				for (Entry<String, DataNodeGroup> iter : topologyMap.entrySet()) {
+					//
+					DataNodeGroup tmpDataNodeGroup = iter.getValue();
+					Double tmpMaxSeed = tmpDataNodeGroup.getHashSeedInfo().getMaxSeed();
+					Double tmpMinSeed = tmpDataNodeGroup.getHashSeedInfo().getMinSeed();
+					
+					if ((criteriaHashSeed > tmpMinSeed) && (criteriaHashSeed < tmpMaxSeed)) {
+						targetDataNodeGroup = tmpDataNodeGroup;
+						break;
+					}
+				}
+				
+				Double newMaxSeedOfTargetDataNodeGroup = criteriaHashSeed - 0.001D;
+				Double newMinSeedOfTargetDataNodeGroup = targetDataNodeGroup.getHashSeedInfo().getMinSeed();
+				
+				DataNodeGroup fromDataNodeGroup = new DataNodeGroup(targetDataNodeGroup.getGroupName(), new HashSeedInfo(newMinSeedOfTargetDataNodeGroup, newMaxSeedOfTargetDataNodeGroup), null);
+				
+				Double newMaxSeedOfMyDataNodeGroup = targetDataNodeGroup.getHashSeedInfo().getMaxSeed();
+				Double newMinSeedOfMyDataNodeGroup = criteriaHashSeed;
+				
+				CopyOnWriteArrayList<DataNode> dataNodes = new CopyOnWriteArrayList<>();
+				dataNodes.add(new DataNode(nodeName));
+				
+				DataNodeGroup toDataNodeGroup = new DataNodeGroup(groupName, new HashSeedInfo(newMinSeedOfMyDataNodeGroup, newMaxSeedOfMyDataNodeGroup), dataNodes);
+				
+				return new ReDistributionStrategy(fromDataNodeGroup, toDataNodeGroup);
 			}
 		}
 	}
 	
 	private void backupAndRestore(ReDistributionStrategy reDistributionStrategy) {
 		//
-		// TODO : BackupAndRestoreEvent 재구성, BackupAndRestoreManager 내부에서 IPC 이용해 호출 
 		if (reDistributionStrategy.getFromDataNodeGroup() != null) {
 			//
 			String fromGroupName = reDistributionStrategy.getFromDataNodeGroup().getGroupName();
-			Float fromGroupMaxSeed = reDistributionStrategy.getFromDataNodeGroup().getHashSeedInfo().getMaxSeed();
-			Float fromGroupMinSeed = reDistributionStrategy.getFromDataNodeGroup().getHashSeedInfo().getMinSeed();
+			Double fromGroupMaxSeed = reDistributionStrategy.getFromDataNodeGroup().getHashSeedInfo().getMaxSeed();
+			Double fromGroupMinSeed = reDistributionStrategy.getFromDataNodeGroup().getHashSeedInfo().getMinSeed();
 			
 			String toGroupName = reDistributionStrategy.getToDataNodeGroup().getGroupName();
-			Float toGroupMaxSeed = reDistributionStrategy.getToDataNodeGroup().getHashSeedInfo().getMaxSeed();
-			Float toGroupMinSeed = reDistributionStrategy.getToDataNodeGroup().getHashSeedInfo().getMinSeed();
+			Double toGroupMaxSeed = reDistributionStrategy.getToDataNodeGroup().getHashSeedInfo().getMaxSeed();
+			Double toGroupMinSeed = reDistributionStrategy.getToDataNodeGroup().getHashSeedInfo().getMinSeed();
 			
 			BackupAndRestoreEvent backupAndRestoreEvent = new BackupAndRestoreEvent(fromGroupName, fromGroupMaxSeed, fromGroupMinSeed, toGroupName, toGroupMaxSeed, toGroupMinSeed);
 			
@@ -351,11 +369,7 @@ public class MainNodeManagerImpl implements MainNodeManager, InMemoryEventListen
 	//		 	https://supawer0728.github.io/2018/03/11/hazelcast/
 	
 	
-	@Override
-	public String getDataNodeName(String map, String seed) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	
 
 	@Override
 	public void entryAdded(EntryEvent<Object, Object> event) {
@@ -394,12 +408,6 @@ public class MainNodeManagerImpl implements MainNodeManager, InMemoryEventListen
 		} catch (ExceptionHazelcastServerAlreadyClosed | ExceptionHazelcastIMapNotFound | ExceptionHazelcastServerConfigError e) {
 			logger.error("[MainNodeManager].entryAdded : error = " + e);
 		}
-	}
-	
-	@Override
-	public void needToRedistribute() {
-		// TODO Auto-generated method stub
-		
 	}
 
 }

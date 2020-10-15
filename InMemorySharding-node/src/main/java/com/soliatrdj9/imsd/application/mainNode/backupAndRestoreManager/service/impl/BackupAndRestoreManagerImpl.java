@@ -31,7 +31,6 @@ public class BackupAndRestoreManagerImpl implements BackupAndRestoreManager {
 		//
 		logger.info("[BackupAndRestoreManager].onBackupAndRestoreEvent : start = " + backupAndRestoreEvent.toString());
 		
-		// TODO :
 		try {
 			String requestBody = om.writeValueAsString(backupAndRestoreEvent);
 			
@@ -48,5 +47,11 @@ public class BackupAndRestoreManagerImpl implements BackupAndRestoreManager {
 		}
 		
 		logger.info("[BackupAndRestoreManager].onBackupAndRestoreEvent : stop = " + backupAndRestoreEvent.toString());
+	}
+
+	@Override
+	public void executeBackupAndRestore(BackupAndRestoreEvent backupAndRestoreEvent) {
+		// TODO Auto-generated method stub
+		
 	}
 }

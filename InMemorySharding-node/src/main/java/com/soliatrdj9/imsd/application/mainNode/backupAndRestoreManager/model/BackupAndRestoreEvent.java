@@ -8,22 +8,21 @@ public class BackupAndRestoreEvent implements Serializable {
 	
 	private String fromGroupName;
 	
-	private Float fromGroupMaxSeed;
+	private Double fromGroupMaxSeed;
 	
-	private Float fromGroupMinSeed;
+	private Double fromGroupMinSeed;
 	
 	private String toGroupName;
 	
-	private Float toGroupMaxSeed;
+	private Double toGroupMaxSeed;
 	
-	private Float toGroupMinSeed;
+	private Double toGroupMinSeed;
 	
 	public BackupAndRestoreEvent() {
 		
 	}
 
-	public BackupAndRestoreEvent(String fromGroupName, Float fromGroupMaxSeed, Float fromGroupMinSeed,
-			String toGroupName, Float toGroupMaxSeed, Float toGroupMinSeed) {
+	public BackupAndRestoreEvent(String fromGroupName, Double fromGroupMaxSeed, Double fromGroupMinSeed, String toGroupName, Double toGroupMaxSeed, Double toGroupMinSeed) {
 		this.fromGroupName = fromGroupName;
 		this.fromGroupMaxSeed = fromGroupMaxSeed;
 		this.fromGroupMinSeed = fromGroupMinSeed;
@@ -40,19 +39,19 @@ public class BackupAndRestoreEvent implements Serializable {
 		this.fromGroupName = fromGroupName;
 	}
 
-	public Float getFromGroupMaxSeed() {
+	public Double getFromGroupMaxSeed() {
 		return fromGroupMaxSeed;
 	}
 
-	public void setFromGroupMaxSeed(Float fromGroupMaxSeed) {
+	public void setFromGroupMaxSeed(Double fromGroupMaxSeed) {
 		this.fromGroupMaxSeed = fromGroupMaxSeed;
 	}
 
-	public Float getFromGroupMinSeed() {
+	public Double getFromGroupMinSeed() {
 		return fromGroupMinSeed;
 	}
 
-	public void setFromGroupMinSeed(Float fromGroupMinSeed) {
+	public void setFromGroupMinSeed(Double fromGroupMinSeed) {
 		this.fromGroupMinSeed = fromGroupMinSeed;
 	}
 
@@ -64,19 +63,19 @@ public class BackupAndRestoreEvent implements Serializable {
 		this.toGroupName = toGroupName;
 	}
 
-	public Float getToGroupMaxSeed() {
+	public Double getToGroupMaxSeed() {
 		return toGroupMaxSeed;
 	}
 
-	public void setToGroupMaxSeed(Float toGroupMaxSeed) {
+	public void setToGroupMaxSeed(Double toGroupMaxSeed) {
 		this.toGroupMaxSeed = toGroupMaxSeed;
 	}
 
-	public Float getToGroupMinSeed() {
+	public Double getToGroupMinSeed() {
 		return toGroupMinSeed;
 	}
 
-	public void setToGroupMinSeed(Float toGroupMinSeed) {
+	public void setToGroupMinSeed(Double toGroupMinSeed) {
 		this.toGroupMinSeed = toGroupMinSeed;
 	}
 

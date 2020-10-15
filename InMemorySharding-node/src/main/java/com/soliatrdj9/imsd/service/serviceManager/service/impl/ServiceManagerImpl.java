@@ -48,7 +48,7 @@ public class ServiceManagerImpl implements ServiceManager {
 	}
 
 	@Override
-	public void scaleOut(Float criteriaHashSeed) throws ExceptionStartNodeInShardingModeFailure, ExceptionStartNodeInShardingModeConflict {
+	public void scaleOut(Double criteriaHashSeed) throws ExceptionStartNodeInShardingModeFailure, ExceptionStartNodeInShardingModeConflict {
 		// TODO Auto-generated method stub
 		try {
 			mainNodeManager.startNodeInShardingMode(criteriaHashSeed);

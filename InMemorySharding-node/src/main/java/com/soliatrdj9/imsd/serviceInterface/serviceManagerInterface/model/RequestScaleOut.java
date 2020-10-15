@@ -7,21 +7,21 @@ package com.soliatrdj9.imsd.serviceInterface.serviceManagerInterface.model;
  */
 public class RequestScaleOut extends RequestDefault {
 	//
-	private Float criteriaHashSeed;
+	private Double criteriaHashSeed;
 
 	public RequestScaleOut() {
 
 	}
 	
-	public RequestScaleOut(Float criteriaHashSeed) {
+	public RequestScaleOut(Double criteriaHashSeed) {
 		this.criteriaHashSeed = criteriaHashSeed;
 	}
 
-	public Float getCriteriaHashSeed() {
+	public Double getCriteriaHashSeed() {
 		return criteriaHashSeed;
 	}
 
-	public void setCriteriaHashSeed(Float criteriaHashSeed) {
+	public void setCriteriaHashSeed(Double criteriaHashSeed) {
 		this.criteriaHashSeed = criteriaHashSeed;
 	}
 

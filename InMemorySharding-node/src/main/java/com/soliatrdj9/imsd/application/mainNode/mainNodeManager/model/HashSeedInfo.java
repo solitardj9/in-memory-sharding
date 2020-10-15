@@ -6,32 +6,32 @@ public class HashSeedInfo implements Serializable {
 
 	private static final long serialVersionUID = 8788371877544565128L;
 	
-	private Float minSeed;
+	private Double minSeed;
 	
-	private Float maxSeed;
+	private Double maxSeed;
 	
 	public HashSeedInfo() {
 		
 	}
 
-	public HashSeedInfo(Float minSeed, Float maxSeed) {
+	public HashSeedInfo(Double minSeed, Double maxSeed) {
 		this.minSeed = minSeed;
 		this.maxSeed = maxSeed;
 	}
 
-	public Float getMinSeed() {
+	public Double getMinSeed() {
 		return minSeed;
 	}
 
-	public void setMinSeed(Float minSeed) {
+	public void setMinSeed(Double minSeed) {
 		this.minSeed = minSeed;
 	}
 
-	public Float getMaxSeed() {
+	public Double getMaxSeed() {
 		return maxSeed;
 	}
 
-	public void setMaxSeed(Float maxSeed) {
+	public void setMaxSeed(Double maxSeed) {
 		this.maxSeed = maxSeed;
 	}
 

@@ -78,6 +78,12 @@ public class MapManagerImpl implements MapManager, InMemoryEventListener {
 		
 		return mapInfos.get(map);
 	}
+	
+	@Override
+	public Map<String/*map*/, MapInfo> getMapInfos() {
+		//
+		return new HashMap<String, MapInfo>(this.mapInfos);
+	}
 
 	@Override
 	public void entryAdded(EntryEvent<Object, Object> event) {

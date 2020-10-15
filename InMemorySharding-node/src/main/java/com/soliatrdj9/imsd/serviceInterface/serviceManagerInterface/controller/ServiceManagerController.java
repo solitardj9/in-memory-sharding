@@ -23,6 +23,7 @@ import com.soliatrdj9.imsd.application.mainNode.mainNodeManager.model.exception.
 import com.soliatrdj9.imsd.service.serviceManager.service.ServiceManager;
 import com.soliatrdj9.imsd.serviceInterface.common.model.ResponseDefualt;
 import com.soliatrdj9.imsd.serviceInterface.serviceManagerInterface.model.RequestScaleOut;
+import com.soliatrdj9.imsd.serviceInterface.serviceManagerInterface.model.RetOfCheckCriteriaHashSeed;
 
 @RestController
 @RequestMapping(value="/management")
@@ -32,6 +33,8 @@ public class ServiceManagerController {
 
 	@Autowired
 	ServiceManager serviceManager;
+	
+	private final static Double shardingSeedLimit = 1000.0;
 	
 	private ObjectMapper om = new ObjectMapper();
 	
@@ -74,7 +77,14 @@ public class ServiceManagerController {
 		try {
 			RequestScaleOut requestScaleOut = om.readValue(requestBody, RequestScaleOut.class);
 			
-			serviceManager.scaleOut(requestScaleOut.getCriteriaHashSeed());
+			RetOfCheckCriteriaHashSeed retOfCheckCriteriaHashSeed = checkCriteriaHashSeed(requestScaleOut.getCriteriaHashSeed());
+			if (retOfCheckCriteriaHashSeed.getIsValid()) {
+				serviceManager.scaleOut(retOfCheckCriteriaHashSeed.getCriteriaHashSeed());
+			}
+			else {
+				logger.error("[ServiceManagerController].scaleOut : error = bad request in criteria hash seed.");
+				return new ResponseEntity<>(new ResponseDefualt(HttpStatus.BAD_REQUEST.value(), "bad request in criteria hash seed."), HttpStatus.BAD_REQUEST);
+			}
 		} catch (ExceptionStartNodeInShardingModeFailure e) {
 			logger.error("[ServiceManagerController].scaleOut : error = " + e);
 			return new ResponseEntity<>(new ResponseDefualt(e.getErrCode(), e.getErrMsg()), e.getHttpStatus());
@@ -88,6 +98,26 @@ public class ServiceManagerController {
 		
 		return new ResponseEntity<>(HttpStatus.OK);
     }
+	
+	private RetOfCheckCriteriaHashSeed checkCriteriaHashSeed(Double criteriaHashSeed) {
+		//
+		if (criteriaHashSeed == null) {
+			//
+			return new RetOfCheckCriteriaHashSeed(true, criteriaHashSeed);
+		}
+		else {
+			//
+			if (criteriaHashSeed >= 1.0f) {
+				return new RetOfCheckCriteriaHashSeed(false, criteriaHashSeed);
+			}
+			else if (criteriaHashSeed <= 0.0f) {
+				return new RetOfCheckCriteriaHashSeed(false, criteriaHashSeed);
+			}
+			else {
+				return new RetOfCheckCriteriaHashSeed(true, (Math.round(criteriaHashSeed * shardingSeedLimit) / shardingSeedLimit));
+			}
+		}
+	}
 	
 	@SuppressWarnings("rawtypes")
 	@PutMapping(value="/service/scaleIn")
